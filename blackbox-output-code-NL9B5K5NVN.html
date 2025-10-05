@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Interativo: Tecido Epitelial</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #e6f3ff; /* Azul-claro chamativo */
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #007bff;
+            margin-bottom: 20px;
+        }
+        .quiz-question {
+            display: none;
+            margin-bottom: 20px;
+        }
+        .quiz-question.active {
+            display: block;
+        }
+        .question-text {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        .options {
+            list-style: none;
+            padding: 0;
+        }
+        .options li {
+            margin: 10px 0;
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .options li:hover {
+            background: #d4edda;
+        }
+        .options li.selected {
+            background: #007bff;
+            color: white;
+        }
+        .feedback {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 8px;
+            display: none;
+        }
+        .correct { background: #d4edda; color: #155724; }
+        .incorrect { background: #f8d7da; color: #721c24; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        #score {
+            font-size: 24px;
+            font-weight: bold;
+            color: #007bff;
+            margin: 20px 0;
+        }
+        #restart {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Quiz Interativo: Tecido Epitelial</h1>
+        <p>Teste seus conhecimentos sobre o tecido epitelial e sua relevância na fisioterapia! São 8 perguntas simples. Escolha a opção correta e veja o feedback imediato.</p>
+
+        <div id="start-screen">
+            <button onclick="startQuiz()">Iniciar Quiz</button>
+        </div>
+
+        <div id="quiz-container"></div>
+
+        <div id="end-screen" style="display: none;">
+            <h2>Quiz Concluído!</h2>
+            <div id="score"></div>
+            <p id="result-text"></p>
+            <button id="restart" onclick="restartQuiz()">Refazer Quiz</button>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: "O que é o tecido epitelial?",
+                options: [
+                    "Uma camada de células que cobre o corpo por dentro e por fora.",
+                    "Um tipo de músculo para se mover.",
+                    "Ossos que protegem os órgãos.",
+                    "Sangue que circula no corpo."
+                ],
+                correct: 0,
+                explanation: "É uma camada de células justapostas que reveste superfícies internas e externas, como a pele e o intestino, e forma glândulas."
+            },
+            {
+                question: "Qual é uma característica básica do tecido epitelial?",
+                options: [
+                    "Ele não tem vasos sanguíneos e se renova rápido.",
+                    "Ele tem muitos vasos e é lento para crescer.",
+                    "Ele é feito só de gordura.",
+                    "Ele só fica na cabeça."
+                ],
+                correct: 0,
+                explanation: "É avascular (sem vasos sanguíneos, nutrido por difusão) e tem polaridade (lados apical e basal), renovando-se rapidamente."
+            },
+            {
+                question: "Quais são os dois tipos principais de epitélio?",
+                options: [
+                    "De cobertura e de glândulas.",
+                    "De ossos e de músculos.",
+                    "De nervos e de pele.",
+                    "De comida e de água."
+                ],
+                correct: 0,
+                explanation: "O de cobertura reveste superfícies (simples ou em camadas), e o de glândulas produz secreções (como suor ou hormônios)."
+            },
+            {
+                question: "Qual função do epitélio é produzir coisas como muco ou suor?",
+                options: [
+                    "Proteger.",
+                    "Secreção.",
+                    "Absorver comida.",
+                    "Sentir cheiros."
+                ],
+                correct: 1,
+                explanation: "A secreção é quando o epitélio produz e libera substâncias, como muco para lubrificar ou suor para refrescar o corpo."
+            },
+            {
+                question: "O que o epitélio do intestino faz principalmente?",
+                options: [
+                    "Absorve nutrientes da comida.",
+                    "Protege contra quedas.",
+                    "Sente sabores doces.",
+                    "Produz lágrimas."
+                ],
+                correct: 0,
+                explanation: "Ele absorve nutrientes com pequenas projeções na superfície que aumentam a área de contato em 600 vezes, ajudando na digestão."
+            },
+            {
+                question: "Qual é um problema comum no tecido epitelial?",
+                options: [
+                    "Feridas por ficar deitado muito tempo.",
+                    "Dor nos dentes.",
+                    "Cabelo caindo.",
+                    "Fome constante."
+                ],
+                correct: 0,
+                explanation: "Úlceras por pressão acontecem em acamados por falta de circulação, causando danos na camada de pele e afetando milhões de pessoas."
+            },
+            {
+                question: "Como a fisioterapia ajuda o tecido epitelial?",
+                options: [
+                    "Com massagens e movimentos para curar feridas.",
+                    "Só com remédios de farmácia.",
+                    "Ignorando a pele.",
+                    "Comendo mais frutas."
+                ],
+                correct: 0,
+                explanation: "A fisioterapia usa avaliação, prevenção (como mudar posição) e tratamentos como luz laser para acelerar a cura em até 30%."
+            },
+            {
+                question: "Por que o epitélio se regenera rápido?",
+                options: [
+                    "Para consertar a pele em poucos dias e evitar infecções.",
+                    "Para crescer mais alto.",
+                    "Para mudar de cor.",
+                    "Para dormir melhor."
+                ],
+                correct: 0,
+                explanation: "Ele se renova com novas células das camadas de baixo, restaurando a barreira em 7-14 dias, o que é importante para cicatrização."
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let answered = [];
+
+        function startQuiz() {
+            document.getElementById('start-screen').style.display = 'none';
+            document.getElementById('quiz-container').style.display = 'block';
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const container = document.getElementById('quiz-container');
+            const q = questions[currentQuestion];
+            container.innerHTML = `
+                <div class="quiz-question active">
+                    <div class="question-text">${q.question}</div>
+                    <ul class="options">
+                        ${q.options.map((opt, index) => `<li onclick="selectOption(${index})">${opt}</li>`).join('')}
+                    </ul>
+                    <div id="feedback" class="feedback"></div>
+                    <button onclick="nextQuestion()" id="next-btn" style="display: none;">Próxima Pergunta</button>
+                </div>
+            `;
+        }
+
+        function selectOption(index) {
+            const options = document.querySelectorAll('.options li');
+            options.forEach(opt => opt.classList.remove('selected'));
+            options[index].classList.add('selected');
+
+            const q = questions[currentQuestion];
+            const feedback = document.getElementById('feedback');
+            const nextBtn = document.getElementById('next-btn');
+
+            if (index === q.correct) {
+                score++;
+                feedback.innerHTML = `<strong>Correto!</strong> ${q.explanation}`;
+                feedback.className = 'feedback correct';
+            } else {
+                feedback.innerHTML = `<strong>Incorreto.</strong> A resposta certa é: ${q.options[q.correct]}. ${q.explanation}`;
+                feedback.className = 'feedback incorrect';
+            }
+            feedback.style.display = 'block';
+            nextBtn.style.display = 'inline-block';
+            answered[currentQuestion] = true;
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion < questions.length) {
+                showQuestion();
+            } else {
+                endQuiz();
+            }
+        }
+
+        function endQuiz() {
+            document.getElementById('quiz-container').style.display = 'none';
+            document.getElementById('end-screen').style.display = 'block';
+            const percentage = Math.round((score / questions.length) * 100);
+            document.getElementById('score').innerHTML = `Sua pontuação: ${score}/${questions.length} (${percentage}%)`;
+            let resultText = '';
+            if (percentage >= 80) resultText = 'Excelente! Você entende bem o básico.';
+            else if (percentage >= 60) resultText = 'Bom! Pratique mais para fixar.';
+            else resultText = 'Ótimo começo! Estude mais sobre o epitélio.';
+            document.getElementById('result-text').innerHTML = resultText;
+        }
+
+        function restartQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            document.getElementById('end-screen').style.display = 'none';
+            document.getElementById('start-screen').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
